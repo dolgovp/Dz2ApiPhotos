@@ -13,5 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.FragmentActivity
 import com.example.dz2apiphotos.ui.theme.Dz2ApiPhotosTheme
 
-class MainActivity : FragmentActivity(R.layout.activity)
+class MainActivity : FragmentActivity(R.layout.activity) {
+}
 
