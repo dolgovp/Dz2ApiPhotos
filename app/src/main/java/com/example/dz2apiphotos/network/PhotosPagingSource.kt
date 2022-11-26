@@ -9,13 +9,12 @@ import java.io.IOException
 private const val STARTING_PAGE_INDEX = 1
 
 class PhotosPagingSource(
-    private val service: ApiService,
-    private val query: String
+    private val networkPhotosRepository: PhotosRepository
 ) : PagingSource<Int, Photo> (){
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Photo> {
         val position = params.key ?: STARTING_PAGE_INDEX
         return try {
-            val photos = service.getPhotos(position,30)
+            val photos = networkPhotosRepository.getPhotos(position,30)
             val nextKey = if (photos.isEmpty()){
                 null
             } else {
@@ -33,9 +32,6 @@ class PhotosPagingSource(
         }
     }
     override fun getRefreshKey(state: PagingState<Int, Photo>): Int? {
-        return state.anchorPosition?.let {anchorPosition ->
-            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
-                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+        return state.anchorPosition
         }
-    }
 }

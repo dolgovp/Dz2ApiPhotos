@@ -1,5 +1,7 @@
 package com.example.dz2apiphotos
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
