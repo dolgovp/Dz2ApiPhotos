@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun HomeScreen(
-    retryAction: () -> Unit,
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel
 ) {
@@ -61,7 +60,7 @@ fun HomeScreen(
                 Loading()
             }
             is LoadState.Error -> {
-                Error(retryAction = retryAction)
+                Error(photos)
             }
         }
         when (val state = photos.loadState.refresh) {
@@ -70,7 +69,7 @@ fun HomeScreen(
                 Loading()
             }
             is LoadState.Error -> {
-                Error(retryAction = retryAction)
+                Error(photos)
             }
         }
         items(
@@ -85,7 +84,7 @@ fun HomeScreen(
                 Loading()
             }
             is LoadState.Error -> {
-                Error(retryAction = retryAction)
+                Error(photos)
             }
         }
     }
@@ -124,16 +123,16 @@ private fun LazyListScope.Loading() {
 }
 
 private fun LazyListScope.Error(
-    retryAction: () -> Unit, modifier: Modifier = Modifier
+     photos: LazyPagingItems<Photo>
 ) {
     item {
         Column(
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(stringResource(R.string.loading_failed))
-            Button(onClick = retryAction) {
+            Button(onClick = { photos.retry() }) {
                 Text(stringResource(R.string.retry))
             }
         }

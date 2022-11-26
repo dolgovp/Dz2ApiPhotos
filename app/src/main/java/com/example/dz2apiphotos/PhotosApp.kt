@@ -25,7 +25,6 @@ fun PhotosApp(modifier: Modifier = Modifier) {
             val homeViewModel: HomeViewModel =
                 viewModel(factory = HomeViewModel.Factory)
             HomeScreen(
-                retryAction = homeViewModel::retryPhotos,
                 homeViewModel = homeViewModel
             )
         }

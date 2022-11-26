@@ -36,10 +36,6 @@ import java.io.IOException
 
 class HomeViewModel(private val photosRepository: PhotosRepository) : ViewModel() {
 
-    fun retryPhotos(){
-        //loading photos after retry
-    }
-
     val photos : Flow<PagingData<Photo>> = Pager(
         pagingSourceFactory = { PhotosPagingSource(photosRepository)},
         config = PagingConfig(pageSize = 30)
