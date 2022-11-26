@@ -36,7 +36,7 @@ class HomeViewModel(private val photosRepository: PhotosRepository) : ViewModel(
         viewModelScope.launch{
             photosUiState = PhotosUiState.Loading
             photosUiState = try {
-                PhotosUiState.Success(photosRepository.getPhotos())
+                PhotosUiState.Success(photosRepository.getPhotos(3))
             } catch (e: IOException) {
                 PhotosUiState.Error
             } catch (e: HttpException) {
