@@ -34,47 +34,17 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-sealed interface PhotosUiState {
-    data class Success(val photos: Flow<PagingData<Photo>>) : PhotosUiState
-    object Error : PhotosUiState
-    object Loading : PhotosUiState
-}
-
-
 class HomeViewModel(private val photosRepository: PhotosRepository) : ViewModel() {
-    var photosUiState: PhotosUiState by mutableStateOf(PhotosUiState.Loading)
-        private set
 
-    init{
-        getPhotos()
+    fun retryPhotos(){
+        //loading photos after retry
     }
 
-    fun getPhotos(){
-        photosUiState = PhotosUiState.Loading
-        photosUiState = try{
-            val photos : Flow<PagingData<Photo>> = Pager(
-                pagingSourceFactory = { PhotosPagingSource(photosRepository)},
-                config = PagingConfig(pageSize = 30)
-            ).flow.cachedIn(viewModelScope)
-            PhotosUiState.Success(photos)
-        } catch (e: IOException){
-            PhotosUiState.Loading
-        }
-    }
+    val photos : Flow<PagingData<Photo>> = Pager(
+        pagingSourceFactory = { PhotosPagingSource(photosRepository)},
+        config = PagingConfig(pageSize = 30)
+    ).flow.cachedIn(viewModelScope)
 
-    /*fun getPhotos(){
-        viewModelScope.launch{
-            photosUiState = PhotosUiState.Loading
-            Log.d(TAG,photosRepository.getPhotos().toString() )
-            photosUiState = try {
-                PhotosUiState.Success(photosRepository.getPhotos())
-            } catch (e: IOException) {
-                PhotosUiState.Error
-            } catch (e: HttpException) {
-                PhotosUiState.Error
-            }
-        }
-    }*/
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

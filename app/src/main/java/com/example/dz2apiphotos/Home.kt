@@ -39,85 +39,73 @@ import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun HomeScreen(
-    UiState: PhotosUiState,
-    modifier: Modifier = Modifier,
     retryAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    homeViewModel: HomeViewModel
 ) {
-    when(UiState){
-        is PhotosUiState.Loading -> LoadingScreen(modifier)
-        is PhotosUiState.Success -> {
-            val photos = UiState.photos.collectAsLazyPagingItems()
-            if (photos.itemCount == 0){
-                ErrorScreen(retryAction, modifier)
-            }else { PhotosGridScreen(photos)}
-        }
-        is PhotosUiState.Error -> ErrorScreen(retryAction)
-    }
-}
 
-/**
- * The home screen displaying the loading message.
- */
-@Composable
-fun LoadingScreen(modifier: Modifier = Modifier) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxSize()
-    ) {
-        Image(
-            modifier = Modifier.size(200.dp),
-            painter = painterResource(R.drawable.loading_img),
-            contentDescription = stringResource(R.string.loading)
-        )
-    }
-}
+    val photos = homeViewModel.photos.collectAsLazyPagingItems()
 
-/**
- * The home screen displaying error message with re-attempt button.
- */
-@Composable
-fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                horizontal = 16.dp,
+                vertical = 32.dp
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(stringResource(R.string.loading_failed))
-        Button(onClick = retryAction) {
-            Text(stringResource(R.string.retry))
+        when (val state = photos.loadState.prepend) {
+            is LoadState.NotLoading -> Unit
+            is LoadState.Loading -> {
+                Loading()
+            }
+            is LoadState.Error -> {
+                Error(retryAction = retryAction)
+            }
         }
-    }
-}
-
-
-@Composable
-fun PhotosGridScreen(photos: LazyPagingItems<Photo>, modifier: Modifier = Modifier) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 200.dp),
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(4.dp)
-    ) {
-        items(photos.itemCount) { index ->
-            photos[index]?.let{
-                PhotoCard(photo = it)
+        when (val state = photos.loadState.refresh) {
+            is LoadState.NotLoading -> Unit
+            is LoadState.Loading -> {
+                Loading()
+            }
+            is LoadState.Error -> {
+                Error(retryAction = retryAction)
+            }
+        }
+        items(
+            items = photos,
+            key = { it.id }
+        ) {
+            RecipeRow(photo = it)
+        }
+        when (val state = photos.loadState.append) {
+            is LoadState.NotLoading -> Unit
+            is LoadState.Loading -> {
+                Loading()
+            }
+            is LoadState.Error -> {
+                Error(retryAction = retryAction)
             }
         }
     }
 }
 
 @Composable
-fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
+private fun RecipeRow(
+    photo: Photo?, modifier: Modifier = Modifier
+) {
+    Spacer(modifier = Modifier.height(8.dp))
     Card(
+        shape = RoundedCornerShape(16.dp),
         modifier = modifier
-            .padding(4.dp)
-            .fillMaxWidth()
-            //.width(with(LocalDensity.current){photo.width.toDp()})
-            .aspectRatio(1f),
-        elevation = 8.dp,
+            .fillMaxSize()
+            .defaultMinSize(minWidth = 200.dp, minHeight = 200.dp),
+        elevation = 8.dp
     ) {
         AsyncImage(
             model = ImageRequest.Builder(context = LocalContext.current)
-                .data(photo.imgSrc)
+                .data(photo?.imgSrc)
                 .crossfade(true)
                 .build(),
             error = painterResource(R.drawable.ic_broken_image),
@@ -125,5 +113,29 @@ fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
             contentDescription = stringResource(R.string.mars_photo),
             contentScale = ContentScale.Fit,
         )
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+}
+
+private fun LazyListScope.Loading() {
+    item {
+        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+    }
+}
+
+private fun LazyListScope.Error(
+    retryAction: () -> Unit, modifier: Modifier = Modifier
+) {
+    item {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(stringResource(R.string.loading_failed))
+            Button(onClick = retryAction) {
+                Text(stringResource(R.string.retry))
+            }
+        }
     }
 }
