@@ -3,10 +3,12 @@ package com.example.dz2apiphotos.network
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.dz2apiphotos.model.Photo
+import com.example.dz2apiphotos.ui.theme.PAGE_LIMIT
+import com.example.dz2apiphotos.ui.theme.STARTING_PAGE_INDEX
 import retrofit2.HttpException
 import java.io.IOException
 
-private const val STARTING_PAGE_INDEX = 1
+
 
 class PhotosPagingSource(
     private val networkPhotosRepository: PhotosRepository
@@ -14,11 +16,11 @@ class PhotosPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Photo> {
         val position = params.key ?: STARTING_PAGE_INDEX
         return try {
-            val photos = networkPhotosRepository.getPhotos(position,30)
+            val photos = networkPhotosRepository.getPhotos(position, PAGE_LIMIT)
             val nextKey = if (photos.isEmpty()){
                 null
             } else {
-                position + (params.loadSize / 30)
+                position + (params.loadSize / PAGE_LIMIT)
             }
             LoadResult.Page(
                 data = photos,

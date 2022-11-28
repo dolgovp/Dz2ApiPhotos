@@ -34,6 +34,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.dz2apiphotos.model.Photo
+import com.example.dz2apiphotos.ui.theme.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 
@@ -49,21 +50,12 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                horizontal = 16.dp,
-                vertical = 32.dp
+                horizontal = COLUMN_H_PADDING.dp,
+                vertical = COLUMN_V_PADDING.dp
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (val state = photos.loadState.prepend) {
-            is LoadState.NotLoading -> Unit
-            is LoadState.Loading -> {
-                Loading()
-            }
-            is LoadState.Error -> {
-                Error(photos)
-            }
-        }
-        when (val state = photos.loadState.refresh) {
+        when (photos.loadState.refresh) {
             is LoadState.NotLoading -> Unit
             is LoadState.Loading -> {
                 Loading()
@@ -78,7 +70,7 @@ fun HomeScreen(
         ) {
             RecipeRow(photo = it)
         }
-        when (val state = photos.loadState.append) {
+        when (photos.loadState.append) {
             is LoadState.NotLoading -> Unit
             is LoadState.Loading -> {
                 Loading()
@@ -94,13 +86,13 @@ fun HomeScreen(
 private fun RecipeRow(
     photo: Photo?, modifier: Modifier = Modifier
 ) {
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(SPACER_HEIGHT.dp))
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(CARD_CORNER.dp),
         modifier = modifier
             .fillMaxSize()
-            .defaultMinSize(minWidth = 200.dp, minHeight = 200.dp),
-        elevation = 8.dp
+            .defaultMinSize(minWidth = CARD_DEFAULT_SIZE.dp, minHeight = CARD_DEFAULT_SIZE.dp),
+        elevation = CARD_ELEVATION.dp
     ) {
         AsyncImage(
             model = ImageRequest.Builder(context = LocalContext.current)
@@ -113,12 +105,12 @@ private fun RecipeRow(
             contentScale = ContentScale.Fit,
         )
     }
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(SPACER_HEIGHT.dp))
 }
 
 private fun LazyListScope.Loading() {
     item {
-        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+        CircularProgressIndicator(modifier = Modifier.padding(PROGRESS_INDICATOR_PADDING.dp))
     }
 }
 

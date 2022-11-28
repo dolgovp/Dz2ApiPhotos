@@ -25,6 +25,7 @@ fun PhotosApp(modifier: Modifier = Modifier) {
             val homeViewModel: HomeViewModel =
                 viewModel(factory = HomeViewModel.Factory)
             HomeScreen(
+                modifier = Modifier,
                 homeViewModel = homeViewModel
             )
         }

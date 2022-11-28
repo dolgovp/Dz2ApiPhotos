@@ -11,6 +11,5 @@ data class Photo(
     val height: Int,
     val url: String,
     @SerialName(value = "download_url")
-    //@SerialName(value = "img_src")
     val imgSrc: String
 )

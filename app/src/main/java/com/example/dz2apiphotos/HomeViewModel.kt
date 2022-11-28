@@ -26,6 +26,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.dz2apiphotos.model.Photo
 import com.example.dz2apiphotos.network.PhotosPagingSource
 import com.example.dz2apiphotos.network.PhotosRepository
+import com.example.dz2apiphotos.ui.theme.PAGE_LIMIT
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.firstOrNull
@@ -38,7 +39,7 @@ class HomeViewModel(private val photosRepository: PhotosRepository) : ViewModel(
 
     val photos : Flow<PagingData<Photo>> = Pager(
         pagingSourceFactory = { PhotosPagingSource(photosRepository)},
-        config = PagingConfig(pageSize = 30)
+        config = PagingConfig(PAGE_LIMIT)
     ).flow.cachedIn(viewModelScope)
 
     companion object {
