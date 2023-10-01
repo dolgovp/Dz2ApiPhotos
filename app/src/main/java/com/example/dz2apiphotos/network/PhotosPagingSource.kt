@@ -2,7 +2,6 @@ package com.example.dz2apiphotos.network
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.dz2apiphotos.model.Photo
 import com.example.dz2apiphotos.ui.theme.PAGE_LIMIT
 import com.example.dz2apiphotos.ui.theme.STARTING_PAGE_INDEX
 import retrofit2.HttpException
@@ -10,7 +9,7 @@ import java.io.IOException
 
 
 
-class PhotosPagingSource(
+/*class PhotosPagingSource(
     private val networkPhotosRepository: PhotosRepository
 ) : PagingSource<Int, Photo> (){
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Photo> {
@@ -36,4 +35,4 @@ class PhotosPagingSource(
     override fun getRefreshKey(state: PagingState<Int, Photo>): Int? {
         return state.anchorPosition
         }
-}
+}*/

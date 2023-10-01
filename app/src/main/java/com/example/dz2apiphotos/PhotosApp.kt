@@ -1,7 +1,7 @@
 package com.example.dz2apiphotos
 
-import android.content.ContentValues.TAG
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PhotosApp(modifier: Modifier = Modifier) {
     Scaffold(
@@ -25,8 +26,7 @@ fun PhotosApp(modifier: Modifier = Modifier) {
             val homeViewModel: HomeViewModel =
                 viewModel(factory = HomeViewModel.Factory)
             HomeScreen(
-                modifier = Modifier,
-                homeViewModel = homeViewModel
+                uiState = homeViewModel.shoppingUiState
             )
         }
     }

@@ -1,7 +1,7 @@
 package com.example.dz2apiphotos
 
-import android.content.ContentValues.TAG
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,120 +13,83 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.UiComposable
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.example.dz2apiphotos.model.Photo
+import com.example.dz2apiphotos.model.Item
+import com.example.dz2apiphotos.model.ShoppingList
 import com.example.dz2apiphotos.ui.theme.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDate
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel
+    uiState: ShoppingUiState,
+    modifier: Modifier = Modifier
 ) {
-
-    val photos = homeViewModel.photos.collectAsLazyPagingItems()
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                horizontal = COLUMN_H_PADDING.dp,
-                vertical = COLUMN_V_PADDING.dp
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when (photos.loadState.refresh) {
-            is LoadState.NotLoading -> Unit
-            is LoadState.Loading -> {
-                Loading()
-            }
-            is LoadState.Error -> {
-                Error(photos)
-            }
-        }
-        items(
-            items = photos,
-            key = { it.id }
-        ) {
-            RecipeRow(photo = it)
-        }
-        when (photos.loadState.append) {
-            is LoadState.NotLoading -> Unit
-            is LoadState.Loading -> {
-                Loading()
-            }
-            is LoadState.Error -> {
-                Error(photos)
-            }
-        }
+    when (uiState) {
+        is ShoppingUiState.Loading -> LoadingScreen(modifier)
+        is ShoppingUiState.Success -> PhotosGridScreen(uiState.shoppingList, modifier)
+        is ShoppingUiState.Error -> ErrorScreen(modifier)
     }
 }
 
 @Composable
-private fun RecipeRow(
-    photo: Photo?, modifier: Modifier = Modifier
-) {
-    Spacer(modifier = Modifier.height(SPACER_HEIGHT.dp))
-    Card(
-        shape = RoundedCornerShape(CARD_CORNER.dp),
-        modifier = modifier
-            .fillMaxSize()
-            .defaultMinSize(minWidth = CARD_DEFAULT_SIZE.dp, minHeight = CARD_DEFAULT_SIZE.dp),
-        elevation = CARD_ELEVATION.dp
+fun LoadingScreen(modifier: Modifier = Modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.fillMaxSize()
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(context = LocalContext.current)
-                .data(photo?.imgSrc)
-                .crossfade(true)
-                .build(),
-            error = painterResource(R.drawable.ic_broken_image),
-            placeholder = painterResource(R.drawable.loading_img),
-            contentDescription = stringResource(R.string.mars_photo),
-            contentScale = ContentScale.Fit,
+        Image(
+            modifier = Modifier.size(200.dp),
+            painter = painterResource(R.drawable.loading_img),
+            contentDescription = stringResource(R.string.loading)
         )
     }
-    Spacer(modifier = Modifier.height(SPACER_HEIGHT.dp))
 }
 
-private fun LazyListScope.Loading() {
-    item {
-        CircularProgressIndicator(modifier = Modifier.padding(PROGRESS_INDICATOR_PADDING.dp))
-    }
-}
-
-private fun LazyListScope.Error(
-     photos: LazyPagingItems<Photo>
-) {
-    item {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(stringResource(R.string.loading_failed))
-            Button(onClick = { photos.retry() }) {
-                Text(stringResource(R.string.retry))
-            }
+/**
+ * The home screen displaying error message with re-attempt button.
+ */
+@Composable
+fun ErrorScreen(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(stringResource(id = R.string.loading_failed))
+        Button(onClick = { }) {
+            Text(stringResource(R.string.retry))
         }
     }
 }
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun PhotosGridScreen(shoppingList: ShoppingList, modifier: Modifier = Modifier) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(1),
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(4.dp)
+    ) {
+
+        items(items = shoppingList.item_list, key = { item -> item.id }) { item ->
+            Text(item.name)
+        }
+    }
+}
+
+
