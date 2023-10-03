@@ -79,10 +79,11 @@ class HomeViewModel (private val shoppingRepository: ShoppingRepository) : ViewM
         }
     }
 
-    private fun createShoppingList(key: String, name: String){
+    fun createShoppingList(key: String, name: String){
         viewModelScope.launch {
             shoppingRepository.createShoppingList(key, name)
         }
+        getAllMyShopLists(key)
     }
     fun removeShoppingList(list_id: Int){
         viewModelScope.launch {
@@ -92,12 +93,15 @@ class HomeViewModel (private val shoppingRepository: ShoppingRepository) : ViewM
     fun addToShoppingList(list_id: Int, name: String, value: Int){
         viewModelScope.launch {
             shoppingRepository.addToShoppingList(list_id,name,value)
+
         }
+        getShoppingList(list_id)
     }
     fun crossItOff(item_id: Int){
         viewModelScope.launch {
             shoppingRepository.crossItOff(item_id)
         }
+        // перенести обновление стейта
     }
 
 

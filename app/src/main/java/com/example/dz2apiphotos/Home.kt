@@ -12,8 +12,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -90,15 +94,34 @@ fun ErrorScreen(modifier: Modifier = Modifier,retryAction: Unit) {
 fun ListsGridScreen(shoppingList: List<Item>, modifier: Modifier = Modifier, navController: NavController, viewModel: HomeViewModel) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxSize(),
         contentPadding = PaddingValues(4.dp)
     ) {
-        val paddingModifier  = Modifier.padding(10.dp)
+        item{
+            Text("Мои списки покупок")
+        }
+        val paddingModifier  = Modifier.padding(4.dp)
         items(items = shoppingList, key = { item -> item.id }) { item ->
             Card(elevation = 10.dp, modifier = paddingModifier, onClick = {viewModel.getShoppingList(item.id)
                 navController.navigate("selectedItem/${item.id}")
-            }) {
-                Text(text = item.name+item.id, modifier = paddingModifier)
+            }){
+                Row(horizontalArrangement = Arrangement.SpaceBetween){
+                    Text(text = item.name + item.id, modifier = paddingModifier)
+                    TextButton({viewModel.removeShoppingList(item.id)
+                        //  здесь нужно попробовать обновить стейт без нового запроса в сеть
+                        viewModel.getAllMyShopLists(viewModel.authKey)}
+                    ) {
+                        Icon(Icons.Default.Delete, null)
+                    }
+                }
+            }
+
+        }
+        item{
+            Button(onClick = {navController.navigate("addList")})
+            {
+                Text("Новый список")
             }
         }
     }

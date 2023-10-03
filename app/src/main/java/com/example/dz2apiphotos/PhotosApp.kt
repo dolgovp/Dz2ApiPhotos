@@ -15,6 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.dz2apiphotos.ui.theme.AddItem
+import com.example.dz2apiphotos.ui.theme.AddList
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -38,6 +40,15 @@ fun PhotosApp(modifier: Modifier = Modifier) {
                     arguments = listOf(navArgument("userId") { type = NavType.IntType })
                 ) { backStackEntry ->
                     SelectedList(backStackEntry.arguments?.getInt("userId")!!, homeViewModel, navController)
+                }
+                composable("addItem/{list_id}",
+                    arguments = listOf((navArgument("list_id") { type = NavType.IntType }),)
+                ) { backStackEntry ->
+                    AddItem(backStackEntry.arguments?.getInt("list_id")!!,
+                        homeViewModel, navController)
+                }
+                composable("addList",) { backStackEntry ->
+                    AddList(homeViewModel, navController)
                 }
             }
         }
