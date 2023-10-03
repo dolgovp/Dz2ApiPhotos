@@ -2,6 +2,7 @@ package com.example.dz2apiphotos.network
 
 import com.example.dz2apiphotos.model.AllStatus
 import com.example.dz2apiphotos.model.AuthStatus
+import com.example.dz2apiphotos.model.CrossOffStatus
 import com.example.dz2apiphotos.model.ItemStatus
 import com.example.dz2apiphotos.model.ListStatus
 import com.example.dz2apiphotos.model.RemoveStatus
@@ -13,6 +14,7 @@ import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -29,25 +31,26 @@ interface ApiService {
     suspend fun createShoppingList(
         @Query("key") key: String,
         @Query("name") name: String
-    ): Call<ListStatus>
+    ): ListStatus
     @POST("RemoveShoppingList?")
     suspend fun removeShoppingList(
         @Query("list_id") list_id: Int
-    ): Call<RemoveStatus>
+    ): RemoveStatus
     @POST("AddToShoppingList?")
     suspend fun addToShoppingList(
         @Query("id") id: Int,
         @Query("value") value: String,
         @Query("n") amount: Int
-    ): Call<ItemStatus>
+    ): ItemStatus
     @POST("CrossItOff?")
     suspend fun crossItOff(
         @Query("id") id: Int
-    ): Call<RemoveStatus>
-    @POST("GetAllMyShopLists?")
+    ): CrossOffStatus
+    @GET("GetAllMyShopLists?")
     suspend fun getAllMyShopLists(
         @Query("key") key: String,
-    ): Call<AllStatus>
+    ): AllStatus
+
     @GET("GetShoppingList?")
     suspend fun getShoppingList(
         @Query("list_id") list_id: Int

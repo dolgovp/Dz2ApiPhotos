@@ -10,37 +10,66 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.dz2apiphotos.model.AllStatus
 import com.example.dz2apiphotos.model.Item
+import com.example.dz2apiphotos.model.ListStatus
 import com.example.dz2apiphotos.model.ShoppingList
 import com.example.dz2apiphotos.network.ShoppingRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.buildJsonObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
+import kotlin.reflect.typeOf
 
-private const val TAG = "SHoppingList"
+private const val TAG = "ShoppingList"
 sealed interface ShoppingUiState {
-    data class Success(val shoppingList: ShoppingList) : ShoppingUiState
+    data class Success(val shoppingList: ShoppingList ) : ShoppingUiState
     data class Error(val error: Throwable) : ShoppingUiState
     object Loading : ShoppingUiState
 }
-class HomeViewModel(private val shoppingRepository: ShoppingRepository) : ViewModel() {
+sealed interface AllListsUiState {
+    data class Success(val shoppingList: AllStatus, ) : AllListsUiState
+    data class Error(val error: Throwable) : AllListsUiState
+    object Loading : AllListsUiState
+}
 
-    var shoppingUiState: ShoppingUiState by mutableStateOf(ShoppingUiState.Loading)
-        private set
-    private var authKey: String = ""
+class HomeViewModel (private val shoppingRepository: ShoppingRepository) : ViewModel() {
+
+    private val _currentListState = MutableStateFlow<ShoppingUiState>(ShoppingUiState.Loading)
+    val currentListState: StateFlow<ShoppingUiState> = _currentListState
+
+    private val _allListsState = MutableStateFlow<AllListsUiState>(AllListsUiState.Loading)
+    val allListsState: StateFlow<AllListsUiState> = _allListsState
+    val authKey = "Q14VD6"
     init{
         viewModelScope.launch {
-            authKey = shoppingRepository.createTestKey()
-            shoppingRepository.authenticate(authKey)
+            getAllMyShopLists(authKey)
+        }
+    }
+    fun getAllMyShopLists(key: String){
+        viewModelScope.launch{
+            _allListsState.value = AllListsUiState.Loading
+            _allListsState.value = try {
+                Log.d(TAG, shoppingRepository.getAllMyShopLists(key).shop_list.toString() )
+                AllListsUiState.Success(shoppingRepository.getAllMyShopLists(key))
+            } catch (e: IOException) {
+                AllListsUiState.Error(e)
+            } catch (e: HttpException) {
+                AllListsUiState.Error(e)
+            }
         }
     }
     fun getShoppingList(list_id: Int){
         viewModelScope.launch{
-            shoppingUiState = ShoppingUiState.Loading
-            shoppingUiState = try {
+            _currentListState.value = ShoppingUiState.Loading
+            _currentListState.value = try {
+                Log.d(TAG,shoppingRepository.getShoppingList(list_id).item_list.toString() )
                 ShoppingUiState.Success(shoppingRepository.getShoppingList(list_id))
             } catch (e: IOException) {
                 ShoppingUiState.Error(e)
@@ -50,20 +79,25 @@ class HomeViewModel(private val shoppingRepository: ShoppingRepository) : ViewMo
         }
     }
 
-    fun createShoppingList(key: String = authKey, name: String){
-
+    private fun createShoppingList(key: String, name: String){
+        viewModelScope.launch {
+            shoppingRepository.createShoppingList(key, name)
+        }
     }
-    fun removeShoppingList(listId: Int){
-
+    fun removeShoppingList(list_id: Int){
+        viewModelScope.launch {
+            shoppingRepository.removeShoppingList(list_id)
+        }
     }
-    fun addToShoppingList(id: Int, name: String, value: Int){
-
+    fun addToShoppingList(list_id: Int, name: String, value: Int){
+        viewModelScope.launch {
+            shoppingRepository.addToShoppingList(list_id,name,value)
+        }
     }
-    fun crossItOff(){
-
-    }
-    fun getAllMyShopLists(key: String = authKey){
-
+    fun crossItOff(item_id: Int){
+        viewModelScope.launch {
+            shoppingRepository.crossItOff(item_id)
+        }
     }
 
 

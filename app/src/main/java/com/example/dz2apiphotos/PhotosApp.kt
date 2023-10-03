@@ -7,8 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key.Companion.Home
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -23,11 +29,17 @@ fun PhotosApp(modifier: Modifier = Modifier) {
                 .padding(it),
             color = MaterialTheme.colors.background
         ) {
+            val navController = rememberNavController()
             val homeViewModel: HomeViewModel =
                 viewModel(factory = HomeViewModel.Factory)
-            HomeScreen(
-                uiState = homeViewModel.shoppingUiState
-            )
+            NavHost(navController = navController, startDestination = "home") {
+                composable("home") { HomeScreen(viewModel = homeViewModel, modifier = Modifier, navController ) }
+                composable("selectedItem/{userId}",
+                    arguments = listOf(navArgument("userId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    SelectedList(backStackEntry.arguments?.getInt("userId")!!, homeViewModel, navController)
+                }
+            }
         }
     }
 }

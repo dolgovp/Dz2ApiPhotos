@@ -4,7 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ListItem(
+class ListItem(
     val created: String,
     val name: String,
     val id: Int,

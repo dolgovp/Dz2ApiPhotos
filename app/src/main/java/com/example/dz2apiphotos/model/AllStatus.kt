@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class AllStatus (
-    @SerialName("shop_list")
-    val shopList: List<Item>,
+    val shop_list: List<Item>,
     val success: Boolean
 )

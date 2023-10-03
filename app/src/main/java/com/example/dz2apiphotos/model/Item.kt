@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class Item(
-    val created: LocalDate,
+class Item(
+    val created: String,
     val name: String,
     val id: Int,
 )
