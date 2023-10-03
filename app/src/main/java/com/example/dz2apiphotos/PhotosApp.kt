@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key.Companion.Home
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -17,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.dz2apiphotos.ui.theme.AddItem
 import com.example.dz2apiphotos.ui.theme.AddList
+import com.example.dz2apiphotos.ui.theme.HomeScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -47,7 +47,7 @@ fun PhotosApp(modifier: Modifier = Modifier) {
                     AddItem(backStackEntry.arguments?.getInt("list_id")!!,
                         homeViewModel, navController)
                 }
-                composable("addList",) { backStackEntry ->
+                composable("addList",) {
                     AddList(homeViewModel, navController)
                 }
             }

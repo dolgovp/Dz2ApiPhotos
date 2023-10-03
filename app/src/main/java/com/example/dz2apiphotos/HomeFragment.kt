@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 
-class HomeFragment : Fragment(){
+/*class HomeFragment : Fragment(){
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -23,4 +23,4 @@ class HomeFragment : Fragment(){
             }
         }
     }
-}
+}*/

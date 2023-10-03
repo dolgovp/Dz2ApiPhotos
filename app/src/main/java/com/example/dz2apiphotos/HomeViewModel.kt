@@ -1,6 +1,7 @@
 package com.example.dz2apiphotos
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -65,6 +66,19 @@ class HomeViewModel (private val shoppingRepository: ShoppingRepository) : ViewM
             }
         }
     }
+
+    fun updateShoppingList(list_id: Int){
+        viewModelScope.launch{
+            _currentListState.value = try {
+                Log.d(TAG,shoppingRepository.getShoppingList(list_id).item_list.toString() )
+                ShoppingUiState.Success(shoppingRepository.getShoppingList(list_id))
+            } catch (e: IOException) {
+                ShoppingUiState.Error(e)
+            } catch (e: HttpException) {
+                ShoppingUiState.Error(e)
+            }
+        }
+    }
     fun getShoppingList(list_id: Int){
         viewModelScope.launch{
             _currentListState.value = ShoppingUiState.Loading
@@ -93,7 +107,6 @@ class HomeViewModel (private val shoppingRepository: ShoppingRepository) : ViewM
     fun addToShoppingList(list_id: Int, name: String, value: Int){
         viewModelScope.launch {
             shoppingRepository.addToShoppingList(list_id,name,value)
-
         }
         getShoppingList(list_id)
     }
