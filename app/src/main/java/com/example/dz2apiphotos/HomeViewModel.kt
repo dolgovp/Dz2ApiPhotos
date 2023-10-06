@@ -1,6 +1,8 @@
 package com.example.dz2apiphotos
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +15,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.dz2apiphotos.model.AllStatus
 import com.example.dz2apiphotos.model.Item
+import com.example.dz2apiphotos.model.ListItem
 import com.example.dz2apiphotos.model.ListStatus
 import com.example.dz2apiphotos.model.ShoppingList
 import com.example.dz2apiphotos.network.ShoppingRepository
@@ -28,9 +31,11 @@ import retrofit2.Response
 import java.io.IOException
 import kotlin.reflect.typeOf
 
-private const val TAG = "ShoppingList"
+private const val TAG = "List"
+private const val CROSS_TAG = "List"
 sealed interface ShoppingUiState {
-    data class Success(val shoppingList: ShoppingList ) : ShoppingUiState
+
+    data class Success(val shoppingList: MutableList<ListItem> ) : ShoppingUiState
     data class Error(val error: Throwable) : ShoppingUiState
     object Loading : ShoppingUiState
 }
@@ -71,7 +76,7 @@ class HomeViewModel (private val shoppingRepository: ShoppingRepository) : ViewM
         viewModelScope.launch{
             _currentListState.value = try {
                 Log.d(TAG,shoppingRepository.getShoppingList(list_id).item_list.toString() )
-                ShoppingUiState.Success(shoppingRepository.getShoppingList(list_id))
+                ShoppingUiState.Success(shoppingRepository.getShoppingList(list_id).item_list)
             } catch (e: IOException) {
                 ShoppingUiState.Error(e)
             } catch (e: HttpException) {
@@ -83,8 +88,7 @@ class HomeViewModel (private val shoppingRepository: ShoppingRepository) : ViewM
         viewModelScope.launch{
             _currentListState.value = ShoppingUiState.Loading
             _currentListState.value = try {
-                Log.d(TAG,shoppingRepository.getShoppingList(list_id).item_list.toString() )
-                ShoppingUiState.Success(shoppingRepository.getShoppingList(list_id))
+                ShoppingUiState.Success(shoppingRepository.getShoppingList(list_id).item_list)
             } catch (e: IOException) {
                 ShoppingUiState.Error(e)
             } catch (e: HttpException) {
@@ -96,8 +100,8 @@ class HomeViewModel (private val shoppingRepository: ShoppingRepository) : ViewM
     fun createShoppingList(key: String, name: String){
         viewModelScope.launch {
             shoppingRepository.createShoppingList(key, name)
+            getAllMyShopLists(key)
         }
-        getAllMyShopLists(key)
     }
     fun removeShoppingList(list_id: Int){
         viewModelScope.launch {
@@ -107,12 +111,16 @@ class HomeViewModel (private val shoppingRepository: ShoppingRepository) : ViewM
     fun addToShoppingList(list_id: Int, name: String, value: Int){
         viewModelScope.launch {
             shoppingRepository.addToShoppingList(list_id,name,value)
+            getShoppingList(list_id)
         }
-        getShoppingList(list_id)
     }
-    fun crossItOff(item_id: Int){
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun crossItOff(item_id: Int, list_id: Int, shoppingList: MutableList<ListItem>){
         viewModelScope.launch {
             shoppingRepository.crossItOff(item_id)
+            updateShoppingList(list_id)
+            //shoppingList.removeIf { it.id == item_id }
+            //_currentListState.value = ShoppingUiState.Success(shoppingList)
         }
         // перенести обновление стейта
     }

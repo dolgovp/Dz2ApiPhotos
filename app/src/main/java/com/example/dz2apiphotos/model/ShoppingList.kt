@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class ShoppingList(
     val success: Boolean,
-    val item_list: List<ListItem>
+    val item_list: MutableList<ListItem>
 )

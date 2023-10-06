@@ -113,7 +113,9 @@ fun ListsGridScreen(shoppingList: List<Item>, modifier: Modifier = Modifier, nav
 
         }
         item{
-            Button(onClick = {navController.navigate("addList")})
+            Button(onClick = {
+                navController.popBackStack()
+                navController.navigate("addList")})
             {
                 Text("Новый список")
             }
@@ -121,9 +123,6 @@ fun ListsGridScreen(shoppingList: List<Item>, modifier: Modifier = Modifier, nav
     }
 }
 
-@Composable
-fun ListGridScreen(shoppingList: List<ListItem>, modifier: Modifier = Modifier) {
 
-}
 
 
